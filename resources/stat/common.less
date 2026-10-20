@@ -1,3 +1,5 @@
+@import "../common/base.less";
+
 * {
   margin: 0;
   padding: 0;
@@ -13,7 +15,6 @@ body {
   background: url("./imgs/bg1.png") top left no-repeat #2a3860;
   background-size: contain;
   width: 600px;
-  font-family: Number, YS2;
 }
 
 .container {
@@ -33,14 +34,16 @@ body {
 
   .title {
     font-size: 36px;
-    font-family: NZBZ;
+    .font-NZBZ;
   }
 
-  .genshin_logo {
+  .genshin-logo {
     position: absolute;
     top: 1px;
     right: 15px;
     width: 97px;
+    background: url(../common/cont/logo.png) no-repeat center;
+    background-size: contain;
   }
 
   .label {

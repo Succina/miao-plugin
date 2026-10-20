@@ -1,88 +1,90 @@
-# Miao-Plugin说明
+# Miao-Plugin 说明
 
-Miao-Plugin是一个Yunzai-Bot的升级插件，提供包括角色查询等升级功能。
+`miao-plugin`是一个`Yunzai-Bot`的升级插件，提供包括角色面板、角色查询等角色相关功能。
 
-具体功能可在安装插件后 通过 #喵喵帮助 进行查看。如需进行设置可通过 #喵喵设置 命令进行管理。
+具体功能可在安装插件后 通过 `#喵喵帮助` 进行查看。如需进行设置则可通过 `#喵喵设置` 命令进行管理。
 
 ---
 
-# 安装与更新
+## 安装与更新
 
-请将miao-plugin放置在Yunzai-Bot的plugins目录下，重启Yunzai-Bot后即可使用。
+### 使用Git安装（推荐）
 
-推荐使用git进行安装，以方便后续升级。在Yunzai根目录夹打开终端，运行
+请将 miao-plugin 放置在 Yunzai-Bot 的 plugins 目录下，重启 Yunzai-Bot 后即可使用。
+
+请使用 git 进行安装，以方便后续升级。在 Yunzai-Bot 根目录夹打开终端，运行下述指令之一
 
 ```
-// 使用gitee
-git clone https://gitee.com/yoimiya-kokomi/miao-plugin.git ./plugins/miao-plugin/
+// 使用 GitCode
+git clone --depth=1 https://gitcode.com/TimeRainStarSky/miao-plugin.git plugins/miao-plugin
+pnpm install -P
 
-// 使用github
-git clone https://github.com/yoimiya-kokomi/miao-plugin.git ./plugins/miao-plugin/
+// 使用 GitHub
+git clone --depth=1 https://github.com/yoimiya-kokomi/miao-plugin plugins/miao-plugin
+pnpm install -P
 ```
 
-进行安装。建议使用上述命令进行安装，以便于后续更新。 管理员发送`#喵喵更新`即可自动更新
+进行安装。安装完毕后，管理员只需发送 `#喵喵更新` 即可自动更新 miao-plugin。
 
-如果是手工下载的zip压缩包，请将解压后的miao-plugin文件夹（请删除压缩自带的-master后缀）放置在Yunzai目录下的plugins文件夹内。
+注：目前 Gitee 源无法使用，需要换源，在云崽目录执行
+
+```
+// 使用 GitCode
+git -C plugins/miao-plugin remote set-url origin https://gitcode.com/TimeRainStarSky/miao-plugin.git
+
+// 使用 GitHub
+git -C plugins/miao-plugin remote set-url origin https://github.com/yoimiya-kokomi/miao-plugin
+```
+
+### 手工下载安装（不推荐）
+
+手工下载安装包，解压后将`miao-plugin-master`更名为`miao-plugin`，然后放置在Yunzai的plugins目录内
+
+虽然此方式能够使用，但无法使用`#喵喵更新`进行更新，不利于后续升级，故不推荐使用
+
+---
 
 ## Yunzai版本与支持
 
-### V2-Yunzai
+`miao-plugin` 支持V3 / V2 版本的Yunzai-Bot
 
-在V3整体稳定前，推荐使用V2版Yunzai安装miao-plugin。 由于官方Yunzai已经停止更新，可使用喵喵版V2-Yunzai
-
-在Yunzai根目录夹打开终端，运行
-
-```
-// 使用gitee
-git remote set-url origin https://gitee.com/yoimiya-kokomi/Yunzai-Bot
-
-// 使用github
-git remote set-url origin https://github.com/yoimiya-kokomi/Yunzai-Bot
-```
-
-即可切换Yunzai远程仓库地址，运行git pull拉取更新即可使用喵喵版V2-Yunzai（版本>2.2.0)
-
-V2-Yunzai在较长一段时间内会维持更新，进行一些Bugfix及更新卡池等信息
-
-### V3-Yunzai
-
-目前V3-Yunzai正在重构中，具体可参见 [Yunzai-V3](https://github.com/Le-niao/Yunzai-Bot) ，miao-plugin已经初步支持V3版本Yunzai，可直接使用。
-
-由于miao-plugin对V3-Yunzai正在适配中，部分功能可能尚未适配或工作不正常，如遇问题可通过issue提报
-
-[issue#13](https://github.com/yoimiya-kokomi/miao-plugin/issues/74) : 如启动时报 Cannot find package 'image-size'
-的错误，直接在yunzai根目录下`npm install image-size --save`即可
+* [Miao-Yunzai](https://github.com/yoimiya-kokomi/Miao-Yunzai) : 喵版Yunzai [Gitee](https://gitee.com/yoimiya-kokomi/Miao-Yunzai)
+  / [Github](https://github.com/yoimiya-kokomi/Miao-Yunzai) ，本体不含签到功能，功能迭代较多，与miao-plugin打通，只建议新部署/迁移
+* [Yunzai-V3](https://github.com/yoimiya-kokomi/Yunzai-Bot) ：Yunzai V3 - 喵喵维护版，icqq版本，与原版Yunza功能基本一致，会保持卡池更新，功能相对稳定，可从原版Yunzai换源直接升级
+* [Yunzai-V3](https://gitee.com/Le-niao/Yunzai-Bot) ：Yunzai V3 - 乐神原版，oicq版本，可能会遇到登录问题
 
 ---
 
-# 功能说明
+## 功能说明
 
-## #雷神面板
+### #雷神面板
 
-### #更新面板
+使用指令 `#面板帮助` 即可了解如何使用此功能。
 
-`#更新面板` 依赖于面板查询API，面板服务由 http://enka.shinshin.moe/ 提供
+#### #更新面板
 
-查询功能经Enka官方授权([issue#63](https://github.com/yoimiya-kokomi/miao-plugin/issues/63#issuecomment-1199348789))，感谢Enka提供的面板查询服务
+`#更新面板` 依赖于面板查询API，面板服务由 http://enka.network/ 提供。
 
-如果可以的话，也请在Patreon上支持Enka，或提供闲置的原神账户，具体可在[Enka官网](http://enka.shinshin.moe/) Discord联系
+> 查询功能经Enka官方授权([issue#63](https://github.com/yoimiya-kokomi/miao-plugin/issues/63#issuecomment-1199348789))，感谢Enka提供的面板查询服务
+>
+> 如果可以的话，也请在Patreon上支持Enka，或提供闲置的原神账户，具体可在[Enka官网](http://enka.network/) Discord联系
+>
+> [issue#63](https://github.com/yoimiya-kokomi/miao-plugin/issues/63#issuecomment-1199734496)
 
-[issue#63](https://github.com/yoimiya-kokomi/miao-plugin/issues/63#issuecomment-1199734496) :
-国内网络如Enka服务访问不稳定，可尝试更换 [@MiniGrayGay](https://github.com/MiniGrayGay) 大佬提供的中转服务 复制`config/profile_default.js`
-为`config/profile.js`，修改其中enkaApi的url配置，配置完成后重启Bot即可生效
+> 可尝试使用`MiniGG-Api`面板服务 [@MiniGrayGay](https://github.com/MiniGrayGay)<br>
+> 发送 `#喵喵设置面板服务332` 修改国服&B服的面板查询由 `MiniGG-Api` 处理
 
-* 【链接1】：https://enka.microgg.cn/
-* 【链接2】：https://enka.minigg.cn/
-
-### #雷神伤害
+#### #雷神伤害
 
 喵喵面板附带的伤害计算功能由喵喵本地计算。如计算有偏差 #雷神伤害 查看伤害加成信息，如确认伤害计算有误可提供伤害录屏截图及uid进行反馈
 
-### #雷神圣遗物
+#### #雷神圣遗物
 
 圣遗物评分为喵喵版评分规则
 
 ---
+
+**在有一定阅读理解能力基础下，建议阅读 [CHANGELOG.md](CHANGELOG.md) 以了解更多内容。**
 
 其余文档咕咕咕中
 
@@ -90,22 +92,21 @@ V2-Yunzai在较长一段时间内会维持更新，进行一些Bugfix及更新�
 
 # 免责声明
 
-1. 功能仅限内部交流与小范围使用，请勿将Yunzai-Bot及Miao-Plugin用于以盈利为目的的场景
-3. 图片与其他素材均来自于网络，仅供交流学习使用，如有侵权请联系，会立即删除
+1. `miao-plugin`自身的UI与代码均开放，无需征得特殊同意，可任意使用。能备注来源最好，但不强求
+2. 以上声明但仅代表`miao-plugin`自身的范畴，请尊重Yunzai本体及其他插件作者的努力，勿将Yunzai及其他插件用于以盈利为目的的场景
+3. miao-plugin的图片与其他素材均来自于网络，仅供交流学习使用，如有侵权请联系，会立即删除
 
-# 其他
+# 资源
 
-* [官方Yunzai-Bot-V3](https://github.com/Le-niao/Yunzai-Bot) : [Gitee](https://gitee.com/Le-niao/Yunzai-Bot)
-  / [Github](https://github.com/Le-niao/Yunzai-Bot)
-* [喵喵Yunzai-Bot-V2](https://github.com/Le-niao/Yunzai-Bot) : [Gitee](https://gitee.com/yoimiya-kokomi/Yunzai-Bot)
-  / [Github](https://github.com/yoimiya-kokomi/Yunzai-Bot)
-* [喵喵插件 Miao-Plugin](https://github.com/yoimiya-kokomi/miao-plugin) : [Gitee](https://gitee.com/yoimiya-kokomi/miao-plugin)
+* [Miao-Yunzai](https://github.com/yoimiya-kokomi/Miao-Yunzai) : 喵版Yunzai [Gitee](https://gitee.com/yoimiya-kokomi/Miao-Yunzai)
+  / [Github](https://github.com/yoimiya-kokomi/Miao-Yunzai)
+* [Yunzai-V3](https://github.com/yoimiya-kokomi/Yunzai-Bot) ：Yunzai V3 - 喵喵维护版（使用 icqq）
+* [Yunzai-V3](https://gitee.com/Le-niao/Yunzai-Bot) ：Yunzai V3 - 乐神原版（使用 oicq）
+* [miao-plugin](https://github.com/yoimiya-kokomi/miao-plugin) : 喵喵插件 [Gitee](https://gitee.com/yoimiya-kokomi/miao-plugin)
   / [Github](https://github.com/yoimiya-kokomi/miao-plugin)
-* [Enka](https://enka.network/): 感谢Enka提供的面板服务
-* [Snap.Genshin](https://www.snapgenshin.com/home/) : 感谢 DGP Studio
-  开发的 [胡桃API](https://github.com/DGP-Studio/Snap.HutaoAPI)
-* QQ群（暂时停止新加入，请见谅）
-    * Yunzai-Bot 官方QQ群：213938015
-    * 喵喵Miao-Plugin QQ群：607710456
-* [爱发电](https://afdian.net/@kokomi) 欢迎老板打赏，喵~
+
+# 其他&感谢
+
+* [Enka.Network](https://enka.network/): 感谢Enka提供的面板服务
+* [Snap.Hutao](https://hut.ao/) : 感谢 DGP Studio 开发的 [胡桃 API](https://github.com/DGP-Studio/Snap.Hutao.Server)
 

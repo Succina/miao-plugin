@@ -1,65 +1,71 @@
-import fs from 'fs'
+import fs from 'node:fs'
 import lodash from 'lodash'
 import { exec } from 'child_process'
-import { Cfg } from '../components/index.js'
-import Common from '../components/Common.js'
+import { Cfg, Common, Data, Version, App } from '#miao'
+import makemsg from '../../../lib/common/common.js'
+import { execSync } from 'child_process'
+import fetch from 'node-fetch'
+import { miaoPath } from '#miao.path'
 
-let cfgMap = {
-  角色: 'char.char',
-  面板: 'char.profile-data',
-  老婆: 'char.wife',
-  戳一戳: 'char.poke',
-  小清新: 'char.se',
-  查他人: 'char.queryOther',
-  图鉴: 'wiki.wiki',
-  图片: 'wiki.pic',
-  深渊: 'wiki.abyss',
-  渲染: 'sys.scale',
-  帮助: 'sys.help'
-}
-let sysCfgReg = `^#喵喵设置\\s*(${lodash.keys(cfgMap).join('|')})?\\s*(.*)$`
-export const rule = {
+let keys = lodash.map(Cfg.getCfgSchemaMap(), (i) => i.key)
+let app = App.init({
+  id: 'admin',
+  name: '喵喵设置',
+  desc: '喵喵设置'
+})
+
+let sysCfgReg = new RegExp(`^#喵喵设置\\s*(${keys.join('|')})?\\s*(.*)$`)
+
+app.reg({
   updateRes: {
-    hashMark: true,
-    reg: '^#喵喵(更新图像|图像更新)$',
-    describe: '【#管理】更新素材'
+    rule: /^#喵喵(强制)?(更新图像|图像更新)$/,
+    fn: updateRes,
+    desc: '【#管理】更新素材'
   },
-  updateMiaoPlugin: {
-    hashMark: true,
-    reg: '^#喵喵(强制)?更新',
-    describe: '【#管理】喵喵更新'
+  update: {
+    rule: /^#喵喵(强制)?更新$/,
+    fn: updateMiaoPlugin,
+    desc: '【#管理】喵喵更新'
+  },
+  updatelog: {
+    rule: /^#?喵喵更新日志$/,
+    fn: Miaoupdatelog,
+    desc: '【#管理】喵喵更新'
   },
   sysCfg: {
-    hashMark: true,
-    reg: sysCfgReg,
-    describe: '【#管理】系统设置'
+    rule: sysCfgReg,
+    fn: sysCfg,
+    desc: '【#管理】系统设置'
   },
-  profileCfg: {
-    hashMark: true,
-    reg: '^#喵喵面板(?:设置)?.*',
-    describe: '【#管理】面板设置'
+  miaoApiInfo: {
+    rule: /^#喵喵api$/,
+    fn: miaoApiInfo,
+    desc: '【#管理】喵喵Api'
   }
-}
+})
 
-const _path = process.cwd()
-const resPath = `${_path}/plugins/miao-plugin/resources/`
+export default app
+
+const resPath = `${miaoPath}/resources/`
 const plusPath = `${resPath}/miao-res-plus/`
 
 const checkAuth = async function (e) {
-  return await e.checkAuth({
-    auth: 'master',
-    replyMsg: `只有主人才能命令喵喵哦~
-    (*/ω＼*)`
-  })
+  if (!e.isMaster) {
+    e.reply(`只有主人才能命令喵喵哦~
+    (*/ω＼*)`)
+    return false
+  }
+  return true
 }
 
-export async function sysCfg (e, { render }) {
+async function sysCfg (e) {
   if (!await checkAuth(e)) {
     return true
   }
 
-  let cfgReg = new RegExp(sysCfgReg)
+  let cfgReg = sysCfgReg
   let regRet = cfgReg.exec(e.msg)
+  let cfgSchemaMap = Cfg.getCfgSchemaMap()
 
   if (!regRet) {
     return true
@@ -69,57 +75,43 @@ export async function sysCfg (e, { render }) {
     // 设置模式
     let val = regRet[2] || ''
 
-    let cfgKey = cfgMap[regRet[1]]
-    if (cfgKey === 'sys.scale') {
-      val = Math.min(200, Math.max(50, val * 1 || 100))
+    let cfgSchema = cfgSchemaMap[regRet[1]]
+    if (cfgSchema.input) {
+      val = cfgSchema.input(val)
+    } else if (cfgSchema.type === 'str') {
+      val = (val || cfgSchema.def) + ''
     } else {
-      val = !/关闭/.test(val)
+      val = cfgSchema.type === 'num' ? (val * 1 || cfgSchema.def) : !/关闭/.test(val)
     }
-
-    if (cfgKey) {
-      Cfg.set(cfgKey, val)
-    }
+    Cfg.set(cfgSchema.cfgKey, val)
   }
 
-  let cfg = {
-    chars: getStatus('char.char'),
-    profile: getStatus('char.profile-data'),
-    wife: getStatus('char.wife'),
-    poke: getStatus('char.poke'),
-    se: getStatus('char.se', false),
-    other: getStatus('char.queryOther'),
-    wiki: getStatus('wiki.wiki'),
-    pic: getStatus('wiki.pic'),
-    abyss: getStatus('wiki.abyss'),
-    imgPlus: fs.existsSync(plusPath),
-    help: getStatus('sys.help', false),
-    scale: Cfg.get('sys.scale', 100)
-  }
+  let schema = Cfg.getCfgSchema()
+  let cfg = Cfg.getCfg()
+  let imgPlus = fs.existsSync(plusPath)
 
   // 渲染图像
   return await Common.render('admin/index', {
-    ...cfg
-  }, { e, render, scale: 1.4 })
+    schema,
+    cfg,
+    imgPlus,
+    isMiao: Version.isMiao
+  }, { e, scale: 1.4 })
 }
 
-const getStatus = function (rote, def = true) {
-  if (Cfg.get(rote, def)) {
-    return '<div class="cfg-status" >已开启</div>'
-  } else {
-    return '<div class="cfg-status status-off">已关闭</div>'
-  }
-}
-
-export async function updateRes (e) {
+async function updateRes (e) {
   if (!await checkAuth(e)) {
     return true
   }
+  let isForce = e.msg.includes('强制')
   let command = ''
   if (fs.existsSync(`${resPath}/miao-res-plus/`)) {
     e.reply('开始尝试更新，请耐心等待~')
     command = 'git pull'
+    if (isForce) {
+      command = 'git  checkout . && git  pull'
+    }
     exec(command, { cwd: `${resPath}/miao-res-plus/` }, function (error, stdout, stderr) {
-      console.log(stdout)
       if (/(Already up[ -]to[ -]date|已经是最新的)/.test(stdout)) {
         e.reply('目前所有图片都已经是最新了~')
         return true
@@ -136,7 +128,7 @@ export async function updateRes (e) {
       }
     })
   } else {
-    command = `git clone https://gitee.com/yoimiya-kokomi/miao-res-plus.git "${resPath}/miao-res-plus/"`
+    command = `git clone https://gitee.com/yoimiya-kokomi/miao-res-plus.git "${resPath}/miao-res-plus/" --depth=1`
     e.reply('开始尝试安装图片加量包，可能会需要一段时间，请耐心等待~')
     exec(command, function (error, stdout, stderr) {
       if (error) {
@@ -151,7 +143,7 @@ export async function updateRes (e) {
 
 let timer
 
-export async function updateMiaoPlugin (e) {
+async function updateMiaoPlugin (e) {
   if (!await checkAuth(e)) {
     return true
   }
@@ -163,7 +155,7 @@ export async function updateMiaoPlugin (e) {
   } else {
     e.reply('正在执行更新操作，请稍等')
   }
-  exec(command, { cwd: `${_path}/plugins/miao-plugin/` }, function (error, stdout, stderr) {
+  exec(command, { cwd: miaoPath }, function (error, stdout, stderr) {
     if (/(Already up[ -]to[ -]date|已经是最新的)/.test(stdout)) {
       e.reply('目前已经是最新版喵喵了~')
       return true
@@ -174,11 +166,24 @@ export async function updateMiaoPlugin (e) {
     }
     e.reply('喵喵更新成功，正在尝试重新启动Yunzai以应用更新...')
     timer && clearTimeout(timer)
-    redis.set('miao:restart-msg', JSON.stringify({
+    Data.setCacheJSON('miao:restart-msg', {
       msg: '重启成功，新版喵喵已经生效',
       qq: e.user_id
-    }), { EX: 30 })
-    timer = setTimeout(function () {
+    }, 30)
+    timer = setTimeout(async function () {
+      // TRSS-Yunzai下使用其自带的Bot.restart重启：
+      // 直接以node app启动时会继承当前控制台重新拉起进程（保持前台stdin可用），pm2下由pm2负责重启
+      // 若走下方的npm run start，在TRSS-Yunzai中该命令实际为pm2 start（后台守护进程），
+      // 会导致更新后Yunzai脱离当前控制台、转为后台运行
+      if (Version.name === 'TRSS-Yunzai' && Bot.restart) {
+        try {
+          await Bot.restart()
+        } catch (error) {
+          e.reply('自动重启失败，请手动重启以应用新版喵喵。\nError: ' + error.stack + '\n')
+          Bot.logger.error(`重启失败\n${error.stack}`)
+        }
+        return
+      }
       let command = 'npm run start'
       if (process.argv[1].includes('pm2')) {
         command = 'npm run restart'
@@ -199,62 +204,51 @@ export async function updateMiaoPlugin (e) {
   return true
 }
 
-export async function profileCfg (e, { render }) {
+async function Miaoupdatelog (e, plugin = 'miao-plugin') {
+  let cm = 'git log  -20 --oneline --pretty=format:"%h||[%cd]  %s" --date=format:"%F %T"'
+  if (plugin) {
+    cm = `cd ./plugins/${plugin}/ && ${cm}`
+  }
+  let logAll
+  try {
+    logAll = await execSync(cm, { encoding: 'utf-8', windowsHide: true })
+  } catch (error) {
+    logger.error(error.toString())
+    this.reply(error.toString())
+  }
+  if (!logAll) return false
+  logAll = logAll.split('\n')
+  let log = []
+  for (let str of logAll) {
+    str = str.split('||')
+    if (str[0] == this.oldCommitId) break
+    if (str[1].includes('Merge branch')) continue
+    log.push(str[1])
+  }
+  let line = log.length
+  log = log.join('\n\n')
+  if (log.length <= 0) return ''
+  let end = '更多详细信息，请前往gitee查看\nhttps://gitee.com/yoimiya-kokomi/miao-plugin'
+  log = await makemsg.makeForwardMsg(this.e, [log, end], `${plugin}更新日志，共${line}条`)
+  e.reply(log)
+}
+
+async function miaoApiInfo (e) {
   if (!await checkAuth(e)) {
     return true
   }
-
-  let keyMap = {
-    好友: 'friend',
-    群: 'group',
-    陌生人: 'stranger'
+  let { diyCfg } = await Data.importCfg('profile')
+  let { qq, token } = (diyCfg?.miaoApi || {})
+  if (!qq || !token) {
+    return e.reply('未正确填写miaoApi token，请检查miao-plugin/config/profile.js文件')
   }
-
-  let regRet = /喵喵面板(?:设置)?\s*(好友|群|群聊|陌生人)?\s*(\d*)\s*(开启|关闭|删除)?\s*$/.exec(e.msg)
-
-  if (!regRet) {
-    return
+  if (token.length !== 32) {
+    return e.reply('miaoApi token格式错误')
   }
-
-  let [, target, groupId, actionType] = regRet
-  if (target === '群聊') {
-    target = '群'
+  let req = await fetch(`http://miao.games/api/info?qq=${qq}&token=${token}`)
+  let data = await req.json()
+  if (data.status !== 0) {
+    return e.reply('token检查错误，请求失败')
   }
-
-  if (target) {
-    if (groupId && (target === '群' || !target)) {
-      if (actionType === '删除') {
-        Cfg.del(`profile.groups.群${groupId}`)
-      } else {
-        Cfg.set(`profile.groups.群${groupId}.status`, actionType !== '关闭')
-      }
-    } else {
-      Cfg.set(`profile.${keyMap[target]}.status`, actionType !== '关闭')
-    }
-  }
-
-  let cfg = {
-    groups: []
-  }
-
-  lodash.forEach(['friend', 'group', 'stranger'], (key) => {
-    cfg[key] = getStatus(`profile.${key}.status`, true)
-  })
-
-  let groups = Cfg.get('profile-data.groups', {})
-  lodash.forEach(lodash.keys(groups), (group, idx) => {
-    if (lodash.isUndefined(groups[group])) {
-      return
-    }
-    cfg.groups.push({
-      group,
-      idx: idx + 1,
-      status: getStatus(`profile.groups.${group}.status`, true)
-    })
-  })
-
-  // 渲染图像
-  return await Common.render('admin/profile', {
-    ...cfg
-  }, { e, render, scale: 1.4 })
+  e.reply(data.msg)
 }

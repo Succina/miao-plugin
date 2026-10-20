@@ -1,0 +1,112 @@
+{{extend elemLayout}}
+{{block 'css'}}
+<link rel="stylesheet" type="text/css" href="{{_res_path}}/common/tpl.css?v=1.0" />
+<link rel="stylesheet" type="text/css" href="{{_res_path}}/character/avatar-list.css" />
+<link rel="stylesheet" type="text/css" href="{{_res_path}}/gacha/gacha-detail.css?v=1.0" />
+{{/block}}
+{{if game === 'gs'}}
+{{ set statMap = { allNum:'抽卡总数', fiveNum:'金卡数',wai:'歪 T.T',fourNum:'紫卡数', fiveAvg:'平均出金', upYs:'UP原石' } }}
+{{else}}
+{{ set statMap = { allNum:'抽卡总数', fiveNum:'金卡数',wai:'歪 T.T',fourNum:'紫卡数', fiveAvg:'平均出金', upYs:'UP星琼' } }}
+{{/if}}
+{{block 'main'}}
+{{ set gameHash = game === 'gs' ? '#' : '*'}}
+<div class="basic">
+  {{if pageInfo && pageInfo.page > 1}}
+  <div class="page-head">
+    <strong>{{face.name}}</strong> #{{uid}} · {{poolName}}池抽卡记录
+    <span>第 {{pageInfo.page}}/{{pageInfo.total}} 张</span>
+  </div>
+  {{else}}
+  <div class="user-banner" style="background-image:url({{_res_path}}{{face?.banner}})">
+    <div class="face">
+      <span style="background-image:url({{_res_path}}{{face?.qFace||face?.face}})"></span>
+    </div>
+    <div class="user-info">
+      <div class="name">
+        <strong>{{face.name}}</strong>
+      </div>
+      <div class="uid">
+        {{if uid}}<span> #{{uid}}</span>{{/if}}
+      </div>
+    </div>
+  </div>
+  {{set luck = gacha.luck}}
+  {{if luck}}
+  <div class="luck" style="--luck-color:{{luck.color}}">
+    {{if luck.image}}
+    <img class="luck-face" src="{{_res_path}}gacha/imgs/luck/{{luck.image}}" alt="{{luck.title}}"/>
+    {{/if}}
+    <div class="luck-main">
+      <div class="luck-label">欧皇度</div>
+      <div class="luck-title">{{luck.title}}</div>
+      <div class="luck-desc">运气超过 <strong>{{luck.percent}}%</strong> 的{{game === 'sr' ? '开拓者' : '旅行者'}}</div>
+    </div>
+    <div class="luck-detail">
+      <div class="luck-line">
+        {{if luck.isUpPool}}
+        UP平均 <strong>{{luck.upAvg}}</strong> 抽<span class="luck-expect">期望 {{luck.upExpect}} 抽（含歪）</span>
+        {{else}}
+        平均出金 <strong>{{luck.fiveAvg}}</strong> 抽<span class="luck-expect">期望 {{luck.fiveExpect}} 抽</span>
+        {{/if}}
+      </div>
+      <div class="luck-stat">
+        {{each statMap title key}}
+        {{if gacha.stat && gacha.stat[key] }}
+        <div class="luck-stat-li">
+          <strong>{{gacha.stat[key]}}</strong>
+          <span>{{title}}</span>
+        </div>
+        {{/if}}
+        {{/each}}
+      </div>
+      {{if luck.fewSample}}
+      <div class="luck-tip">样本较少，仅供参考</div>
+      {{/if}}
+      {{if luck.hasNewPool}}
+      <div class="luck-tip">最新卡池数据暂未收录，新卡池中的UP判定可能不准，待卡池数据更新后即可恢复</div>
+      {{/if}}
+    </div>
+  </div>
+  {{/if}}
+  <div class="ck-notice">
+    <strong>{{gameHash}}抽卡帮助</strong>获取抽卡链接，<strong>{{gameHash}}更新抽卡记录</strong>更新抽卡信息，<strong>{{gameHash}}抽卡统计</strong><strong>{{gameHash}}角色统计</strong>可查看按卡池分析结果
+  </div>
+  {{/if}}
+  <div class="cont avatar-cont">
+    <div class="gacha-list">
+      {{each gacha.fiveLog ds idx}}
+      {{set item = gacha.items[ds.id]}}
+      {{set max = type === 'weapon'?80:90}}
+      {{set hasDate = (idx===0 || idx ===gacha.items.length-1 || (idx>0 && gacha.fiveLog[idx-1].date !== ds.date)) }}
+      {{set nameWidth = (game==='sr' && type==='weapon'? 120 : 90)}}
+      <div class="gacha-item {{!hasDate?'no-date':'has-date'
+            }} {{ds.isUp ?'up':'wai'}} {{item.abbr==='已抽'?'no-avatar':''}}">
+        <div class="date ">
+          <div class="dot {{idx===0?'first':''}} {{idx===gacha.items.length-1?'last':''}}"></div>
+          <div class="txt">{{ds.date}}</div>
+        </div>
+        <div class="name" style="width:{{nameWidth}}px">{{item.abbr}}</div>
+        <div class="icon">
+          <div class="icon-bg star{{item.star}}">
+            <span class="img mini" style="background-image:url({{_res_path}}{{item.img}})"></span>
+          </div>
+        </div>
+        <div class="process">
+          {{set count = ds.count}}
+          <div class="bar  {{count<=10?'gold': (count<max*0.5 ? 'good' : (count<max*0.83) ? 'normal': 'bad')}}"
+            style="width:{{count/max*100}}%">{{count}}
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    {{if gacha.hiddenNum}}
+    <div class="gacha-more">仅显示最近 {{gacha.shownNum}} 条记录，更早的 {{gacha.hiddenNum}} 条未显示（顶部统计包含全部记录），发送 {{gameHash}}{{poolName}}全部记录 查看全部</div>
+    {{/if}}
+    {{if pageInfo}}
+    <div class="gacha-more">第 {{pageInfo.page}}/{{pageInfo.total}} 张 · 第 {{pageInfo.from}}~{{pageInfo.to}} 条，共 {{pageInfo.count}} 条五星记录</div>
+    {{/if}}
+  </div>
+</div>
+{{/block}}

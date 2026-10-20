@@ -1,91 +1,46 @@
-import { segment } from 'oicq'
-import { Character } from '../components/models.js'
-import lodash from 'lodash'
-import Calendar from '../components/Calendar.js'
-import Common from '../components/Common.js'
-import { Cfg } from '../components/index.js'
+import { App } from '#miao'
+import Calendar from './wiki/Calendar.js'
+import TodayMaterial from './wiki/TodayMaterial.js'
+import CharWiki from './wiki/CharWiki.js'
+import CalendarSr from './wiki/CalendarSr.js'
+import CalendarZZZ from './wiki/CalendarZZZ.js'
 
-// eslint-disable-next-line no-unused-vars
-let action = {
+let app = App.init({
+  id: 'wiki',
+  name: '角色资料'
+})
+app.reg({
+
+  // #神里天赋 #夜兰命座
   wiki: {
-    keyword: '命座|天赋|技能|资料|照片|写真|图片|插画'
+    rule: '^#喵喵WIKI$',
+    check: CharWiki.check,
+    fn: CharWiki.wiki
+  },
+
+  // #日历
+  calendar: {
+    rule: /^(#|喵喵)+(日历|日历列表)$/,
+    fn: Calendar.render
+  },
+
+  // *日历
+  calendarSr: {
+    rule: /^#(星铁)+(日历|日历列表)$/,
+    fn: CalendarSr.render
+  },
+  
+  // %日历
+  calendarZZZ: {
+    rule: /^#(绝区零)+(日历|日历列表)$/,
+    fn: CalendarZZZ.render
+  },
+
+  // #今日素材
+  today: {
+    rule: /^#(今日|今天|每日|我的|明天|明日|周([1-7]|一|二|三|四|五|六|日))*(素材|材料|天赋)[ |0-9]*$/,
+    fn: TodayMaterial.render
   }
-}
+})
 
-export async function wiki (e, { render }) {
-  if (!e.msg) {
-    return false
-  }
-
-  let reg = /#?(.+)(命座|命之座|天赋|技能|资料|照片|写真|图片|图像)$/; let msg = e.msg
-  let ret = reg.exec(msg)
-
-  if (!ret || !ret[1] || !ret[2]) {
-    return false
-  }
-
-  let mode = 'talent'
-  if (/命/.test(ret[2])) {
-    mode = 'cons'
-  } else if (/图|画|写真|照片/.test(ret[2])) {
-    mode = 'pic'
-  }
-
-  if ((mode === 'pic' && Common.isDisable(e, 'wiki.pic')) ||
-    (mode !== 'pic' && Common.isDisable('wiki.wiki'))) {
-    return
-  }
-
-  let char = Character.get(ret[1])
-  if (!char) {
-    return false
-  }
-
-  if (mode === 'pic') {
-    let img = char.getCardImg(Cfg.get('char.se', false), false)
-    if (img && img.img) {
-      e.reply(segment.image(process.cwd() + '/plugins/miao-plugin/resources/' + img.img))
-    } else {
-      e.reply('暂无图片')
-    }
-    return true
-  }
-
-  if (char.isCustom) {
-    e.reply('暂不支持自定义角色')
-    return true
-  }
-
-  return await Common.render('wiki/character', {
-    save_id: '天赋' + char.name,
-    ...char,
-    mode,
-    line: getLineData(char),
-    _char: `/meta/character/${char.name}/`
-  }, { e, render, scale: 1 })
-}
-
-const getLineData = function (data) {
-  let ret = []
-  lodash.forEach(data.lvStat.detail['90'], (num, idx) => {
-    ret.push({
-      num,
-      label: data.lvStat.stat[idx]
-    })
-  })
-
-  return ret
-}
-
-export async function calendar (e, { render }) {
-  let calData = await Calendar.get()
-  let mode = 'calendar'
-  if (/(日历列表|活动)$/.test(e.msg)) {
-    mode = 'list'
-  }
-
-  return await Common.render('wiki/calendar', {
-    ...calData,
-    displayMode: mode
-  }, { e, render, scale: 1.1 })
-}
+export default app

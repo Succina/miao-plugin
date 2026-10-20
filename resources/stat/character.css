@@ -112,7 +112,7 @@
   width: 100%;
   height: 100%;
   position: absolute;
-  top: -3px;
+  top: 2px;
   margin-left: 3px;
 }
 .char-list .avatar .name .avatar_name {
@@ -188,4 +188,4 @@
 .char-list .cons-bg > div:last-child {
   border-radius: 0 3px 3px 0;
 }
-/*# sourceMappingURL=character.css.map */
+/*# sourceMappingURL=character-talent.css.map */

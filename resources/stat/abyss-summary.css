@@ -1,16 +1,46 @@
+.font-YS {
+  font-family: Number, "汉仪文黑-65W", YS, PingFangSC-Medium, "PingFang SC", sans-serif;
+}
+.font-NZBZ {
+  font-family: Number, "印品南征北战NZBZ体", NZBZ, "汉仪文黑-65W", YS, PingFangSC-Medium, "PingFang SC", sans-serif;
+}
 body,
 .container {
-  width: 690px;
+  width: 970px;
 }
 .container {
   padding: 5px 0 10px 5px;
 }
-.abyss-stat {
+.head-box {
+  display: flex;
+  width: 100%;
+}
+.head-box .title {
+  font-size: 45px;
+  padding-bottom: 10px;
+  width: 70%;
+}
+.head-box .title span {
+  font-size: 30px;
+  margin-left: 10px;
+  color: #d3bc8e;
+}
+.head-box .uid {
+  text-align: right;
+  width: 30%;
+  padding-top: 25px;
+  padding-right: 10px;
+  font-size: 25px;
+}
+.abyss-stat-cont {
   display: flex;
   padding: 5px;
 }
+.abyss-stat {
+  display: flex;
+}
 .abyss-stat .cont {
-  margin: 5px;
+  margin: 5px 10px 5px 5px;
 }
 .abyss-stat strong {
   text-shadow: 0 0 3px #000;
@@ -26,7 +56,7 @@ body,
 .abyss-stat .stat-title span {
   display: block;
   font-weight: normal;
-  font-family: NZBZ, sans-serif;
+  font-family: Number, "印品南征北战NZBZ体", NZBZ, "汉仪文黑-65W", YS, PingFangSC-Medium, "PingFang SC", sans-serif;
   font-size: 24px;
 }
 .abyss-stat .stat-title strong {
@@ -36,49 +66,71 @@ body,
 .abyss-stat .stat-msg {
   position: absolute;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
   padding: 5px 10px;
   width: 100%;
   text-shadow: 0 0 1px #000;
-  font-size: 12px;
+  font-size: 14px;
 }
 .abyss-stat .stat-msg .msg {
   display: block;
+  line-height: 25px;
 }
 .abyss-stat .stat-msg .msg strong {
-  font-size: 15px;
+  font-size: 20px;
   padding: 0 2px;
   font-weight: normal;
   color: #d3bc8e;
 }
-.abyss-stat .abyss-notice {
-  width: 325px;
-}
-.abyss-stat .abyss-notice .cont-body {
-  height: 221px;
-}
-.abyss-stat .abyss-notice ul {
-  padding-left: 0;
-}
-.abyss-stat .abyss-notice ul li {
-  margin-bottom: 13px;
-  list-style: none;
-  margin-left: 0;
-  font-size: 13px;
-}
 .avatar-banner {
-  margin-top: -10px;
-  height: 270px;
-  width: 158px;
+  height: 300px;
+  width: 175px;
   background-repeat: no-repeat;
   background-size: 100% auto;
-  background-position: top center;
+  background-position: 0 10%;
 }
-.cont-title .abyss-star {
+.abyss-data {
+  display: flex;
+  padding: 0 6px;
+}
+.abyss-data .abyss-item {
+  color: #fff;
+  margin: 5px;
+}
+.abyss-data .abyss-item .info {
+  text-align: center;
+  text-shadow: 0 0 1px #000, 1px 1px 3px #000;
+}
+.abyss-data .abyss-item .info strong {
+  display: block;
+  font-weight: normal;
+  font-family: Number, "印品南征北战NZBZ体", NZBZ, "汉仪文黑-65W", YS, PingFangSC-Medium, "PingFang SC", sans-serif;
+}
+.abyss-data .abyss-item .info span {
+  font-size: 24px;
+  display: block;
+}
+.abyss-data .abyss-item .info span:after {
+  content: "次";
+  font-size: 15px;
+  margin-left: 2px;
+}
+.abyss-title {
+  margin: -3px 0 8px;
+}
+.abyss-title strong {
+  color: #d3bc8e;
+  font-size: 18px;
+  font-family: Number, "印品南征北战NZBZ体", NZBZ, "汉仪文黑-65W", YS, PingFangSC-Medium, "PingFang SC", sans-serif;
+  font-weight: normal;
+  margin-right: 10px;
+}
+.abyss-title .abyss-star {
   font-size: 15px;
   color: #fff;
 }
-.cont-title .abyss-star:before {
+.abyss-title .abyss-star:before {
   content: "";
   vertical-align: bottom;
   display: inline-block;
@@ -96,10 +148,12 @@ body,
   background: rgba(255, 255, 255, 0.5);
   height: 80px;
   vertical-align: middle;
-  margin: 15px 10px 0;
+  margin: 15px 8px 0;
 }
 .abyss-team {
   display: flex;
+  margin-right: -5px;
+  margin-left: -5px;
 }
 .abyss-detail {
   display: flex;
@@ -117,34 +171,37 @@ body,
 .abyss-level .info {
   margin-bottom: 5px;
   display: flex;
+  padding-left: 8px;
 }
 .abyss-level .title {
+  font-size: 16px;
   white-space: nowrap;
   font-weight: bold;
 }
 .abyss-level .star {
-  height: 15px;
+  height: 18px;
   display: inline-block;
   background: url(./imgs/star.png);
-  background-size: 15px 15px;
+  background-size: 18px 18px;
   margin-left: 5px;
 }
 .abyss-level .star.star1 {
-  width: 15px;
-  margin-right: 30px;
+  width: 18px;
+  margin-right: 36px;
 }
 .abyss-level .star.star2 {
-  width: 30px;
-  margin-right: 15px;
+  width: 36px;
+  margin-right: 18px;
 }
 .abyss-level .star.star3 {
-  width: 45px;
+  width: 54px;
   margin-right: 0;
 }
 .abyss-level .time {
   text-align: right;
   width: 60%;
   color: #aaa;
+  font-size: 14px;
 }
 .abyss-level .avatars {
   display: flex;
@@ -155,7 +212,7 @@ body,
   position: relative;
 }
 .abyss-level .avatars .avatar-list.up {
-  padding-right: 10px;
+  padding-right: 15px;
 }
 .abyss-level .avatars .avatar-list.up:after {
   content: "";
@@ -164,21 +221,64 @@ body,
   width: 1px;
   height: 16px;
   background: rgba(255, 255, 255, 0.3);
-  right: 5px;
+  right: 8px;
   top: 50%;
   margin-top: -8px;
 }
 .abyss-level .avatars .avatar-icon {
-  width: 23px;
-  height: 23px;
+  width: 33px;
+  height: 33px;
   border-radius: 50%;
-  margin-right: 1px;
+  margin-right: 2px;
 }
 .abyss-level .avatars .avatar-icon .img {
   background-size: auto 100%;
   background-position: center;
-  width: 20px;
-  height: 20px;
+  width: 29px;
+  height: 29px;
   margin: 2px;
+}
+.abyss-notice .cont-body {
+  font-size: 16px;
+}
+.avatar-banner.avatar-枫原万叶,
+.img.wide.avatar-枫原万叶 {
+  background-position: 0 -13%;
+}
+.avatar-banner.avatar-九条裟罗,
+.img.wide.avatar-九条裟罗 {
+  background-position: 0 0;
+}
+.avatar-banner.avatar-香菱,
+.img.wide.avatar-香菱 {
+  background-position: 0 -16%;
+}
+.avatar-banner.avatar-行秋,
+.img.wide.avatar-行秋 {
+  background-position: 0 -16%;
+}
+.avatar-banner.avatar-甘雨,
+.img.wide.avatar-甘雨 {
+  background-position: 0 -8%;
+}
+.avatar-banner.avatar-刻晴,
+.img.wide.avatar-刻晴 {
+  background-position: 0 -5%;
+}
+.avatar-banner.avatar-神里绫华,
+.img.wide.avatar-神里绫华 {
+  background-position: 0 13%;
+}
+.avatar-banner.avatar-班尼特,
+.img.wide.avatar-班尼特 {
+  background-position: 0 15%;
+}
+.avatar-banner.avatar-五郎,
+.img.wide.avatar-五郎 {
+  background-position: 0 15%;
+}
+.avatar-banner.avatar-托马,
+.img.wide.avatar-托马 {
+  background-position: 0 -5%;
 }
 /*# sourceMappingURL=abyss-summary.css.map */

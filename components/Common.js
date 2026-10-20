@@ -1,40 +1,26 @@
-import { Cfg } from './index.js'
-import { segment } from 'oicq'
-import { currentVersion, yunzaiVersion, isV3 } from './Changelog.js'
+import Cfg from './Cfg.js'
+import Render from './common/Render.js'
 
-export const render = async function (path, params, cfg) {
-  let paths = path.split('/')
-  let { render, e } = cfg
-  let layoutPath = process.cwd() + '/plugins/miao-plugin/resources/common/layout/'
-  let base64 = await render(paths[0], paths[1], {
-    ...params,
-    _layout_path: layoutPath,
-    defaultLayout: layoutPath + 'default.html',
-    elemLayout: layoutPath + 'elem.html',
-    sys: {
-      scale: Cfg.scale(cfg.scale || 1),
-      copyright: `Created By Yunzai-Bot<span class="version">${yunzaiVersion}</span> & Miao-Plugin<span class="version">${currentVersion}</span>`
+const Common = {
+  render: async function (arg1, arg2, arg3, arg4) {
+    if (arguments.length === 4 && typeof (arguments[1]) === 'string') {
+      return Render.render(arg2, arg3, {
+        ...arg4,
+        plugin: arg1
+      })
+    } else {
+      return Render.render(arg1, arg2, arg3)
     }
-  })
-
-  let ret = true
-  if (base64) {
-    ret = isV3 ? await e.reply(base64) : await e.reply(segment.image(`base64://${base64}`))
-  }
-  return cfg.retMsgId ? ret : true
-}
-
-export const todoV3 = function (e) {
-  if (isV3) {
-    e.reply('本功能暂时不支持V3版Yunzai...')
-    return true
-  }
-  return false
-}
-
-export default {
-  render,
+  },
   cfg: Cfg.get,
-  isDisable: Cfg.isDisable,
-  todoV3
+  sleep (ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+  },
+
+  async downFile () {
+    console.log('down file')
+  }
+
 }
+
+export default Common
